@@ -34,7 +34,7 @@ async def generate_ai_content(message: Message, chats: Chats, model: GeminiModel
                 return
         
         result_ai = co.chat.send_message(
-            message=text,
+            message=f"User {message.from_user.username!r} asked you: {text!r}.",
             config = model.generate()
         )
         result_ai = result_ai.text
@@ -57,7 +57,7 @@ async def continue_chat(message: Message, chats: Chats, gemini:GeminiConfig):
             if co is None:
                 return
             result_ai = co.chat.send_message(
-                message=text,
+                message=f"User {message.from_user.username!r} asked you: {text!r}.",
                 config = gemini.basic.generate()
             )
             result_ai = result_ai.text
