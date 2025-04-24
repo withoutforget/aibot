@@ -1,9 +1,6 @@
 [bot]
-debug_api_key = '5566552634:AAFaNDcPD0WhuY_84yFYgX8vT69KzeCNHSg'
-general_api_key = '8022169791:AAEGr3BxUVCHZLUhIXszX9Q7LHsrrpXKr9M'
 is_debug = false
 [ai]
-api_key = 'AIzaSyCsA2cOT0KcTRYKy7ui4jK4yoCyPDmG1eM'
 model = 'gemini-2.0-flash'
 promt_file = './config/ai_promt.txt'
 tokens = 600
