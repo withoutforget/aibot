@@ -6,6 +6,7 @@ dynaconf_merge = true
 debug_api_key = ''
 general_api_key = ''
 [ai]
-api_key = ''
+    [ai.gemini]
+    api_key = ''
 ```
 Для секции bot нужно взять ключи [отсюда](https://t.me/BotFather), а для ai надо взять [отсюда](https://aistudio.google.com/app/apikey).
