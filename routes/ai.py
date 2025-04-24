@@ -36,7 +36,9 @@ async def generate_ai_content(message: Message, chats: Chats, model: GeminiModel
         result_ai = co.chat.send_message(
             message=text,
             config = model.generate()
-        ).text
+        )
+        toks = result_ai.to_json_dict()['usage_metadata']['promt_token_count']
+        result_ai = result_ai.text
         new_message = await message.reply( telegram_format(result_ai), parse_mode = ParseMode.HTML)
         co.messages.add(message.message_id)
         co.messages.add(new_message.message_id)
