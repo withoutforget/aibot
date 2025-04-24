@@ -23,6 +23,6 @@ class Config:
 
 def get_config() -> Config:
     dyna = Dynaconf(
-        settings_files = [ "./config/config.toml" ]
+        settings_files = [ "./config/config.toml", "./config/.secrets.toml" ]
     )
     return dyna
