@@ -1,7 +1,16 @@
 [bot]
-is_debug = false
+is_debug = true
 [ai]
-model = 'gemini-2.0-flash'
-promt_file = './config/ai_promt.txt'
-tokens = 600
-temperature = 1.5
+
+    [ai.gemini]
+        model = 'gemini-2.0-flash'
+
+        [ai.gemini.basic]
+        promt_file = './config/ai_promt.txt'
+        tokens = 600
+        temperature = 1.5
+
+        [ai.gemini.full]
+        promt_file = './config/ai_promt.txt'
+        tokens = 600
+        temperature = 0.1

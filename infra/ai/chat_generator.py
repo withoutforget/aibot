@@ -1,12 +1,11 @@
 from google.genai import Client
 from google.genai.chats import Chat
-from google.genai.types import GenerateContentConfig
-from config import AIConfig
+from config import GeminiConfig
 
 class ChatGenerator:
-    config: AIConfig
+    config: GeminiConfig
     client: Client 
-    def __init__(self, config: AIConfig):
+    def __init__(self, config: GeminiConfig):
         self.config = config 
         self.client = Client(
             api_key = self.config.api_key
@@ -15,11 +14,7 @@ class ChatGenerator:
     def create_chat(self) -> Chat:
         return self.client.chats.create(
             model = self.config.model,
-            config = GenerateContentConfig(
-                system_instruction = open(self.config.promt_file).read(),
-                max_output_tokens=self.config.tokens,
-                temperature=self.config.temperature
-            )
+            config = self.config.basic.generate()
         )
     
 

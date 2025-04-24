@@ -1,7 +1,7 @@
 from dishka import make_async_container, Provider, AsyncContainer, Scope, provide
 from app import App
-from config import Config, AIConfig, BotConfig, get_config
-
+from config import Config, AIConfig, BotConfig, get_config, GeminiConfig
+from dataclasses import dataclass
 from infra.ai.ai import Chats, ChatGenerator
 
 class MyProvider(Provider):    
@@ -20,13 +20,17 @@ class MyProvider(Provider):
         return cfg.bot 
     
     @provide
+    async def _get_gemini_cfg(self, cfg: Config) -> GeminiConfig:
+        return cfg.ai.gemini
+    
+    @provide
     async def _get_chats_object(self, ai: AIConfig) -> Chats:
         if 'chats' in self.tmp.keys():
             return self.tmp['chats']
 
         obj =  Chats(
             generator = ChatGenerator(
-                config = ai
+                config = ai.gemini
             )
         )
 
