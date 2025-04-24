@@ -6,6 +6,7 @@ from adaptix import Retort
 class BotConfig:
     general_api_key: str
     debug_api_key: str 
+    is_debug: bool
 
 @dataclass(init=True)
 class AIConfig:
