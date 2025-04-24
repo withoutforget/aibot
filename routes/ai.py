@@ -7,7 +7,7 @@ from routes.mid import ChatsMiddleware
 from config import GeminiConfig, GeminiModelConfig
 
 from chatgpt_md_converter import telegram_format
-
+from time import time
 import logging
 
 router = Router()
@@ -26,7 +26,7 @@ async def generate_ai_content(message: Message, chats: Chats, model: GeminiModel
             message.reply_to_message is not None and message.reply_to_message.text is None
         ):
             co: ChatObject = chats.create_chat()
-            chats.update_chat(co.uuid)
+            #chats.update_chat(co.uuid)
         else:
             co = chats.find_chat(message.reply_to_message.message_id)
             if co is None:
@@ -40,6 +40,7 @@ async def generate_ai_content(message: Message, chats: Chats, model: GeminiModel
         new_message = await message.reply( telegram_format(result_ai), parse_mode = ParseMode.HTML)
         co.messages.add(message.message_id)
         co.messages.add(new_message.message_id)
+        co.last_time_used = time()
     except Exception as e:
         logging.info(f'Got exception ({e})')
         await message.reply(fr'Что-то пошло не так...\n({e})')
