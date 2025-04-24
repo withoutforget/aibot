@@ -11,7 +11,7 @@ class App:
         else:
             api_key = self.config.general_api_key
         self._bot = Bot(
-            token = self.config.debug_api_key
+            token = api_key
         )
         self._dp = Dispatcher(
 
