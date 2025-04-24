@@ -37,7 +37,6 @@ async def generate_ai_content(message: Message, chats: Chats, model: GeminiModel
             message=text,
             config = model.generate()
         )
-        toks = result_ai.to_json_dict()['usage_metadata']['promt_token_count']
         result_ai = result_ai.text
         new_message = await message.reply( telegram_format(result_ai), parse_mode = ParseMode.HTML)
         co.messages.add(message.message_id)
@@ -46,6 +45,31 @@ async def generate_ai_content(message: Message, chats: Chats, model: GeminiModel
     except Exception as e:
         logging.info(f'Got exception ({e})')
         await message.reply(fr'Что-то пошло не так...\n({e})')
+
+@router.message(lambda message: message.reply_to_message is not None and message.reply_to_message.from_user.id == message.bot.id)
+async def continue_chat(message: Message, chats: Chats, gemini:GeminiConfig):
+    try:
+        text = message.text
+        if not (message.reply_to_message is None or (
+                message.reply_to_message is not None and message.reply_to_message.text is None
+            )):
+            co = chats.find_chat(message.reply_to_message.message_id)
+            if co is None:
+                return
+            result_ai = co.chat.send_message(
+                message=text,
+                config = gemini.basic.generate()
+            )
+            result_ai = result_ai.text
+            new_message = await message.reply( telegram_format(result_ai), parse_mode = ParseMode.HTML)
+            co.messages.add(message.message_id)
+            co.messages.add(new_message.message_id)
+            co.last_time_used = time()
+    except Exception as e:
+        logging.info(f'Got exception ({e})')
+        await message.reply(fr'Что-то пошло не так... ({e})')
+
+
 @router.message(Command(commands=['ai']))
 async def gen_ai(message: Message, chats: Chats, gemini: GeminiConfig):
     await generate_ai_content(message, chats, gemini.basic)
@@ -53,4 +77,3 @@ async def gen_ai(message: Message, chats: Chats, gemini: GeminiConfig):
 @router.message(Command(commands=['fai']))
 async def gen_ai(message: Message, chats: Chats, gemini: GeminiConfig):
     await generate_ai_content(message, chats, gemini.full) # not to use cause i don't wanna spend too much tokens
-    
