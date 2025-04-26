@@ -1,0 +1,14 @@
+[project]
+name = "aibot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "adaptix>=3.0.0b10",
+    "aiogram>=3.20.0.post0",
+    "chatgpt-md-converter>=0.3.4",
+    "dishka>=1.5.3",
+    "dynaconf>=3.2.10",
+    "google-genai>=1.12.1",
+]

@@ -1,12 +1,12 @@
 run:
-	python.exe -m src.main
+	uv run -m src.main
 clean:
-	pyclean .
+	uv clean
 depends:
-	pip install -r requirements.txt
+	uv venv
+	uv sync
 
-ldepends:
-	pip install -r --break-system-packages
-lrun:
-	python3 -m src.main
+ldepends: depends
+
+lrun: run
 
