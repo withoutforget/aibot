@@ -1,8 +1,8 @@
 from dishka import make_async_container, Provider, AsyncContainer, Scope, provide
-from app import App
-from config import Config, AIConfig, BotConfig, get_config, GeminiConfig
-from dataclasses import dataclass
-from infra.ai.ai import Chats, ChatGenerator
+from src.app import App
+from src.config import Config, AIConfig, BotConfig, get_config, GeminiConfig
+from src.infra.ai.ai import Chats, ChatGenerator
+from src.infra.user_resources.users import UserResoucres
 
 class MyProvider(Provider):    
     tmp = dict()
@@ -38,18 +38,13 @@ class MyProvider(Provider):
 
         return obj
     
-from aiogram.dispatcher.middlewares.base import BaseMiddleware
-
-class DishkaMiddleware(BaseMiddleware):
-    def __init__(self, container: AsyncContainer):
-        self.container = container
-    
-    async def __call__(self, handler, event, data):
-        data['container'] = self.container
-        return await handler(event, data)
-
-def setup_dishka(app: App):
+    @provide
+    async def _get_user_res(self) -> UserResoucres:
+        if 'user_res' not in self.tmp.keys():
+            self.tmp['user_res'] = UserResoucres()
+        return self.tmp['user_res']
+def get_container() -> AsyncContainer:
     cont = make_async_container(
         MyProvider(scope = Scope.APP)
     )
-    app.dp().message.middleware(DishkaMiddleware(container = cont))
+    return cont

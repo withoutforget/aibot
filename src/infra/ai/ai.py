@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from google.genai.chats import Chat
-from infra.ai.chat_generator import ChatGenerator
+from src.infra.ai.chat_generator import ChatGenerator
 from uuid import uuid4, UUID
 from time import time
 

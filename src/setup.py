@@ -1,6 +1,6 @@
-from config import Config
-from app import App
-from routes.setup import setup_routes
+from src.config import Config
+from src.app import App
+from src.routes.setup import setup_routes
 
 def setup_app(config: Config) -> App:
     app = App(

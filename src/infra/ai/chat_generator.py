@@ -1,6 +1,6 @@
 from google.genai import Client
 from google.genai.chats import Chat
-from config import GeminiConfig
+from src.config import GeminiConfig
 
 class ChatGenerator:
     config: GeminiConfig

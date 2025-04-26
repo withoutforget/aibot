@@ -1,5 +1,5 @@
 run:
-	python.exe main.py
+	python.exe -m src.main
 clean:
 	pyclean .
 depends:
@@ -8,7 +8,5 @@ depends:
 ldepends:
 	pip install -r --break-system-packages
 lrun:
-	python3 main.py
-
-
+	python3 -m src.main
 

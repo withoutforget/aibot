@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher
-from config import BotConfig, Config
+from src.config import BotConfig
 
 class App:
     config: BotConfig
