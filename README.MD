@@ -82,3 +82,7 @@ make depends
 ```bash
 make clean
 ```
+**Инициализация нужных директорий**
+```bash
+make init_dirs
+```
