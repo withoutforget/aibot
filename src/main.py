@@ -1,4 +1,3 @@
-import logging
 import asyncio
 
 from src.config import Config, get_config

@@ -9,6 +9,7 @@ class UserData:
     tokens_used: int = 0
     promts_generated: int = 0
 
+
 class UserResoucres:
     _data: dict[TelegramID, UserData] = dict()
 

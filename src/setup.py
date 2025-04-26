@@ -6,14 +6,10 @@ from time import time
 import logging
 
 
-def setup_logging(
-        show_all_loggers = False,
-        disable_all_except_aiogram = True
-):
+def setup_logging(show_all_loggers=False, disable_all_except_aiogram=True):
+    log_file_path = f"./logs/{int(time())}.log"
 
-    log_file_path = f'./logs/{int(time())}.log'
-
-    open(log_file_path, 'x').close()
+    open(log_file_path, "x").close()
 
     logging.basicConfig(
         level=logging.INFO,
@@ -26,18 +22,15 @@ def setup_logging(
     )
 
     if show_all_loggers:
+        loggers = [name for name in logging.root.manager.loggerDict.keys()]
 
-        loggers = [
-            name for name in logging.root.manager.loggerDict.keys()
-        ]
+        logging.info(f"Current loggers: {loggers!r}")
 
-        logging.info(f'Current loggers: {loggers!r}')
-    
     if disable_all_except_aiogram:
         for kName in logging.root.manager.loggerDict:
-            if kName.startswith('aiogram'):
+            if kName.startswith("aiogram"):
                 continue
-            logging.getLogger(kName).disabled = True 
+            logging.getLogger(kName).disabled = True
 
 
 def setup_app(config: Config) -> App:
