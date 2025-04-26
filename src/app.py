@@ -7,7 +7,6 @@ class App:
 
     def __init__(self, config: BotConfig):
         self.config = config
-        api_key = ""
         if self.config.is_debug:
             api_key = self.config.debug_api_key
         else:

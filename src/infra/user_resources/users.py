@@ -7,7 +7,7 @@ TelegramID = int
 class UserData:
     username: str
     tokens_used: int = 0
-
+    promts_generated: int = 0
 
 class UserResoucres:
     _data: dict[TelegramID, UserData] = dict()
@@ -25,4 +25,5 @@ class UserResoucres:
         if not self.user_exist(id):
             return False
         self._data[id].tokens_used += tokens
+        self._data[id].promts_generated += 1
         return True

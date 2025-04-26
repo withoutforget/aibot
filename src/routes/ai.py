@@ -91,5 +91,5 @@ async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]
     for user in sorted(
         user_res._data.values(), key=lambda u: u.tokens_used, reverse=True
     ):
-        result += f"\nt.me/{user.username} - {user.tokens_used}"
+        result += f"\nt.me/{user.username} - {user.tokens_used} ({user.promts_generated} messages);"
     await message.reply(result)

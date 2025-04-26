@@ -5,14 +5,14 @@ from adaptix import Retort
 from google.genai.types import GenerateContentConfig
 
 
-@dataclass(init=True)
+@dataclass()
 class BotConfig:
     general_api_key: str
     debug_api_key: str
     is_debug: bool
 
 
-@dataclass(init=True)
+@dataclass()
 class GeminiModelConfig:
     promt_file: str
     tokens: int
@@ -26,7 +26,7 @@ class GeminiModelConfig:
         )
 
 
-@dataclass(init=True)
+@dataclass()
 class GeminiConfig:
     api_key: str
     model: str
@@ -36,12 +36,12 @@ class GeminiConfig:
     full: GeminiModelConfig
 
 
-@dataclass(init=True)
+@dataclass()
 class AIConfig:
     gemini: GeminiConfig
 
 
-@dataclass(init=True)
+@dataclass()
 class Config:
     bot: BotConfig
     ai: AIConfig
