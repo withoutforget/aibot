@@ -5,8 +5,10 @@ clean:
 depends:
 	uv venv
 	uv sync
-
+format:
+	uv run ruff format
+check:
+	uv run ruff check
 ldepends: depends
 
 lrun: run
-

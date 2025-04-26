@@ -12,6 +12,7 @@ class ChatObject:
     last_time_used: int
     messages: set[int]
 
+
 class Chats:
     generator: ChatGenerator
     _chats: list[ChatObject] = []
@@ -23,22 +24,22 @@ class Chats:
         for co in self._chats:
             if message_id in co.messages:
                 return co
-    
+
     def get_chat(self, uuid: UUID) -> ChatObject | None:
         for co in self._chats:
             if co.uuid == uuid:
                 return co
-    
+
     def create_chat(self) -> ChatObject:
         co = ChatObject(
-            uuid = uuid4(),
-            chat = self.generator.create_chat(),
-            last_time_used = time(),
-            messages=set()
+            uuid=uuid4(),
+            chat=self.generator.create_chat(),
+            last_time_used=time(),
+            messages=set(),
         )
         self._chats.append(co)
         return self._chats[-1]
-    
+
     def update_chat(self, uuid: UUID):
         co = self.get_chat(uuid)
         co.last_time_used = time()
