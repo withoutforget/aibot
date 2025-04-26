@@ -99,7 +99,7 @@ async def continue_chat(message: Message, chats: FromDishka[Chats],
 async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]):
     result = 'Потрачено кредитов:'
     for user in sorted(user_res._data.values(), key = lambda u: u.tokens_used, reverse=True):
-        result += f'\nt.me/{user.username}:{user.tokens_used}'   
+        result += f'\nt.me/{user.username} - {user.tokens_used}'   
     await message.reply(result)
 
 
