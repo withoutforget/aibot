@@ -33,3 +33,5 @@ all: depends check clean init_dirs run
 
 docker_del:
 	docker rm (docker ps -a -q)
+docker_compose:
+	docker compose up -d
