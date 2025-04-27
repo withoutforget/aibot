@@ -11,9 +11,8 @@ class ChatObject:
     chat: Chat
     last_time_used: int
     messages: set[int]
-    link_to_topic_start:str
-    topic_starter_username:str
-    
+    link_to_topic_start: str
+    topic_starter_username: str
 
 
 class Chats:
@@ -39,8 +38,8 @@ class Chats:
             chat=self.generator.create_chat(),
             last_time_used=time(),
             messages=set(),
-            link_to_topic_start='',
-            topic_starter_username=''
+            link_to_topic_start="",
+            topic_starter_username="",
         )
         self._chats.append(co)
         return self._chats[-1]

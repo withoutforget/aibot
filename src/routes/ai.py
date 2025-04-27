@@ -11,6 +11,13 @@ from dishka import FromDishka
 from src.infra.user_resources.users import UserResoucres
 from src.usecases.ai import ChatService
 
+from enum import Enum
+
+class TopicAction(Enum):
+    TOPIC_START = 1
+    TOPIC_CONTINUE = 2
+    TOPIC_START_WITH_CONTEXT = 3
+
 router = Router()
 
 
@@ -19,11 +26,13 @@ async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]
     metadata = chat_service.get_metadata(message.reply_to_message.message_id)
     await message.reply( '\n'.join(f'{k} - {v}' for k,v in metadata.items()) )
 
-@router.message(Command(commands=["ai"]))
-async def create_chat(
-    message: Message,
-    res: FromDishka[UserResoucres],
-    chat_service: FromDishka[ChatService],
+
+async def manage_chat(
+        message: Message,
+        res: UserResoucres,
+        chat_service: ChatService,
+        action: ChatAction,
+        context: list[Message] | None = None
 ):
     text = message.text.lstrip("/ai")
     user = message.from_user
@@ -39,7 +48,12 @@ async def create_chat(
             action=ChatAction.TYPING,
         )
 
-        result, uuid = chat_service.start_chat(msg=message)
+        match action:
+            case TopicAction.TOPIC_START:
+                result, uuid = chat_service.start_chat(msg=message,
+                                                       context=context)
+            case TopicAction.TOPIC_CONTINUE:
+                result, uuid = chat_service.continue_chat(message.reply_to_message, message)
 
         tokens_used = result.usage_metadata.total_token_count
 
@@ -56,6 +70,30 @@ async def create_chat(
 
     except Exception as e:
         await message.reply(f"Что-то пошло не так... ({e})")
+    
+
+@router.message(Command(commands=["ai"]))
+async def create_chat(
+    message: Message,
+    res: FromDishka[UserResoucres],
+    chat_service: FromDishka[ChatService],
+):
+
+    if message.reply_to_message is not None:
+        context = [ message.reply_to_message ]
+    else:
+        context = [ ]       
+
+    if len(context) == 0:
+        context = None
+
+    await manage_chat(
+        message=message,
+        res = res,
+        chat_service=chat_service,
+        action=TopicAction.TOPIC_START,
+        context = context
+    )
 
 
 @router.message(RepliedToBotFilter())
@@ -64,30 +102,12 @@ async def continue_chat(
     res: FromDishka[UserResoucres],
     chat_service: FromDishka[ChatService],
 ):
-    user = message.from_user
-    try:
-        await message.bot.send_chat_action(
-            chat_id=message.chat.id,
-            message_thread_id=message.message_thread_id,
-            action=ChatAction.TYPING,
-        )
-
-        result, uuid = chat_service.continue_chat(message.reply_to_message, message)
-
-        tokens_used = result.usage_metadata.total_token_count
-
-        if not res.user_exist(user.id):
-            res.add_user(user.id, user.username)
-
-        res.increment_tokens(user.id, tokens_used)
-
-        new_message = await message.reply(
-            telegram_format(result.text), parse_mode=ParseMode.HTML
-        )
-
-        chat_service.include_messasge(uuid, new_message.message_id)
-    except Exception as e:
-        await message.reply(f"Что-то пошло не так... ({e})")
+    await manage_chat(
+        message=message,
+        res = res,
+        chat_service=chat_service,
+        action=TopicAction.TOPIC_CONTINUE
+    )
 
 
 @router.message(Command(commands=["ai_list"]))

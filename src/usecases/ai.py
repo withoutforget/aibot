@@ -13,10 +13,14 @@ class ChatService:
         self._chats = chats
         self._gemini = config
 
-    def _send_to_chat(self, msg: Message, chat: Chat):
-        request = self._gemini.format_string.format(
-            username=msg.from_user.username, text=msg.text
+    def _format_request(self, msg: Message, context: str = '') -> str:
+        return self._gemini.format_string.format(
+            username=msg.from_user.username, text=msg.text,
+            context = context
         )
+
+    def _send_to_chat_with(self, msg: Message, chat: Chat, context: str):
+        request = self._format_request(msg, context)
 
         config = self._gemini.basic.generate()
 
@@ -24,20 +28,25 @@ class ChatService:
 
         return result
 
-    def start_chat(self, msg: Message) -> tuple[GenerateContentResponse, UUID]:
+    def start_chat(self, msg: Message, context: list[Message] | None = None) -> tuple[GenerateContentResponse, UUID]:
+        if context is None:
+            context = ''
+        else:
+            context = '\n'.join(self._format_request(msg) for msg in context)
+
         new_chat = self._chats.create_chat()
-        new_chat.topic_starter_username = f'@{msg.from_user.username}'
-        
-        msg_link = f'{str(msg.chat.id).lstrip('-100')}/'
+        new_chat.topic_starter_username = f"@{msg.from_user.username}"
+
+        msg_link = f"{str(msg.chat.id).lstrip('-100')}/"
         if msg.message_thread_id is not None:
-            msg_link += f'{msg.message_thread_id}/'
-        msg_link += f'{msg.message_id}'
-        
-        new_chat.link_to_topic_start = f't.me/c/{msg_link}'
+            msg_link += f"{msg.message_thread_id}/"
+        msg_link += f"{msg.message_id}"
 
-        result = self._send_to_chat(msg, new_chat.chat)
+        new_chat.link_to_topic_start = f"t.me/c/{msg_link}"
+
+        result = self._send_to_chat_with(msg, new_chat.chat, context)
         return result, new_chat.uuid
-
+    
     def include_messasge(self, uuid: UUID, message_id: int):
         self._chats.get_chat(uuid).messages.add(message_id)
 
@@ -45,14 +54,14 @@ class ChatService:
         self, old_msg: Message, new_message: Message
     ) -> tuple[GenerateContentResponse, UUID]:
         chat: ChatObject = self._chats.find_chat(old_msg.message_id)
-        result = self._send_to_chat(new_message, chat.chat)
+        result = self._send_to_chat_with(new_message, chat.chat, '')
         return result, chat.uuid
-    
+
     def get_metadata(self, message_id: int) -> dict:
         chat = self._chats.find_chat(message_id)
         if chat is not None:
             return {
-                'topic_start': chat.link_to_topic_start,
-                'topic_starter': chat.topic_starter_username,
+                "topic_start": chat.link_to_topic_start,
+                "topic_starter": chat.topic_starter_username,
             }
         return {}
