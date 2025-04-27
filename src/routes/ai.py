@@ -14,6 +14,11 @@ from src.usecases.ai import ChatService
 router = Router()
 
 
+@router.message(Command(commands=["info"]), RepliedToBotFilter())
+async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]):
+    metadata = chat_service.get_metadata(message.reply_to_message.message_id)
+    await message.reply( '\n'.join(f'{k} - {v}' for k,v in metadata.items()) )
+
 @router.message(Command(commands=["ai"]))
 async def create_chat(
     message: Message,

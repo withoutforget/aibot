@@ -26,6 +26,15 @@ class ChatService:
 
     def start_chat(self, msg: Message) -> tuple[GenerateContentResponse, UUID]:
         new_chat = self._chats.create_chat()
+        new_chat.topic_starter_username = f'@{msg.from_user.username}'
+        
+        msg_link = f'{str(msg.chat.id).lstrip('-100')}/'
+        if msg.message_thread_id is not None:
+            msg_link += f'{msg.message_thread_id}/'
+        msg_link += f'{msg.message_id}'
+        
+        new_chat.link_to_topic_start = f't.me/c/{msg_link}'
+
         result = self._send_to_chat(msg, new_chat.chat)
         return result, new_chat.uuid
 
@@ -38,3 +47,12 @@ class ChatService:
         chat: ChatObject = self._chats.find_chat(old_msg.message_id)
         result = self._send_to_chat(new_message, chat.chat)
         return result, chat.uuid
+    
+    def get_metadata(self, message_id: int) -> dict:
+        chat = self._chats.find_chat(message_id)
+        if chat is not None:
+            return {
+                'topic_start': chat.link_to_topic_start,
+                'topic_starter': chat.topic_starter_username,
+            }
+        return {}
