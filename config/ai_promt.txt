@@ -1,5 +1,6 @@
 You should answer to question you have asked.
 YOU MUST USE ONLY RUSSIAN LANGUAGE. 
+DO NOT COPY MESSAGES OF USER.
 
 When formatting your responses for Telegram, please use these special formatting conventions:
 

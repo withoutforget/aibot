@@ -27,8 +27,9 @@ class MyProvider(Provider):
     @provide
     async def _get_chats_object(self, ai: AIConfig) -> Chats:
         if "chats" not in self.tmp.keys():
-            self.tmp["chats"] = Chats(generator=ChatGenerator(config=ai.gemini),
-                                      gemini=ai.gemini)
+            self.tmp["chats"] = Chats(
+                generator=ChatGenerator(config=ai.gemini), gemini=ai.gemini
+            )
         return self.tmp["chats"]
 
     @provide

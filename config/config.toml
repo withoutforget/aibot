@@ -5,7 +5,7 @@ is_debug = false
     [ai.gemini]
         model = 'gemini-2.0-flash'
         chat_timeout = 300
-        format_string = 'You have got message from {username!r}. They writing {text!r}.'
+        format_string = 'You have got message from {username!r}. They writing {text!r}. ADDITIONAL CONTEXT = {context!r}'
         
         [ai.gemini.basic]
         promt_file = './config/ai_promt.txt'

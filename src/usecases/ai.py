@@ -13,13 +13,13 @@ class ChatService:
         self._chats = chats
         self._gemini = config
 
-    def _format_request(self, msg: Message) -> str:
+    def _format_request(self, msg: Message, context: str = "") -> str:
         return self._gemini.format_string.format(
-            username=msg.from_user.username, text=msg.text
+            username=msg.from_user.username, text=msg.text, context=context
         )
 
-    def _send_to_chat_with(self, msg: Message, chat: Chat):
-        request = self._format_request(msg)
+    def _send_to_chat_with(self, msg: Message, chat: Chat, context: str = ""):
+        request = self._format_request(msg, context)
 
         config = self._gemini.basic.generate()
 
@@ -28,7 +28,7 @@ class ChatService:
         return result
 
     def start_chat(
-        self, msg: Message
+        self, msg: Message, context: str = ""
     ) -> tuple[GenerateContentResponse, UUID]:
         new_chat = self._chats.create_chat()
         new_chat.topic_starter_username = f"@{msg.from_user.username}"
@@ -40,7 +40,7 @@ class ChatService:
 
         new_chat.link_to_topic_start = f"t.me/c/{msg_link}"
 
-        result = self._send_to_chat_with(msg, new_chat.chat)
+        result = self._send_to_chat_with(msg, new_chat.chat, context)
         return result, new_chat.uuid
 
     def include_messasge(self, uuid: UUID, message_id: int):

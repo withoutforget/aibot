@@ -1,3 +1,4 @@
+import logging
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.enums import ParseMode, ChatAction
@@ -23,13 +24,16 @@ class TopicAction(Enum):
 router = Router()
 
 
-@router.message(Command(commands=["info"]), RepliedToBotFilter())
+@router.message(Command(commands=["stats"]), RepliedToBotFilter())
 async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]):
-    metadata = chat_service.get_metadata(message.reply_to_message.message_id)
-    
-    output = f"<a href='{metadata['topic_start']}'>Начало диалога</a>. Диалог был начат {metadata['topic_starter']}."
+    try:
+        metadata = chat_service.get_metadata(message.reply_to_message.message_id)
 
-    await message.reply( text = output, parse_mode=ParseMode.HTML )
+        output = f"<a href='{metadata['topic_start']}'>Начало диалога</a>. Диалог был начат {metadata['topic_starter']}."
+
+        await message.reply(text=output, parse_mode=ParseMode.HTML)
+    except:
+        await message.reply("К сожалению, информации о данном чате нет.")
 
 
 async def manage_chat(
@@ -45,37 +49,30 @@ async def manage_chat(
         await message.reply("Вы ничего не написали.")
         return
 
-    try:
-        await message.bot.send_chat_action(
-            chat_id=message.chat.id,
-            message_thread_id=message.message_thread_id,
-            action=ChatAction.TYPING,
-        )
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id,
+        message_thread_id=message.message_thread_id,
+        action=ChatAction.TYPING,
+    )
 
-        match action:
-            case TopicAction.TOPIC_START:
-                result, uuid = chat_service.start_chat(msg=message)
-            case TopicAction.TOPIC_CONTINUE:
-                result, uuid = chat_service.continue_chat(
-                    message.reply_to_message, message
-                )
+    match action:
+        case TopicAction.TOPIC_START:
+            result, uuid = chat_service.start_chat(msg=message)
+        case TopicAction.TOPIC_CONTINUE:
+            result, uuid = chat_service.continue_chat(message.reply_to_message, message)
 
-        tokens_used = result.usage_metadata.total_token_count
+    tokens_used = result.usage_metadata.total_token_count
 
-        if not res.user_exist(user.id):
-            res.add_user(user.id, user.username)
+    if not res.user_exist(user.id):
+        res.add_user(user.id, user.username)
 
-        res.increment_tokens(user.id, tokens_used)
+    res.increment_tokens(user.id, tokens_used)
 
-        new_message = await message.reply(
-            telegram_format(result.text), parse_mode=ParseMode.HTML
-        )
+    new_message = await message.reply(
+        telegram_format(result.text), parse_mode=ParseMode.HTML
+    )
 
-        chat_service.include_messasge(uuid, new_message.message_id)
-
-    except Exception as e:
-        await message.reply(f"Что-то пошло не так... ({e})")
-
+    chat_service.include_messasge(uuid, new_message.message_id)
 
 @router.message(Command(commands=["ai"]))
 async def create_chat(
@@ -83,7 +80,6 @@ async def create_chat(
     res: FromDishka[UserResoucres],
     chat_service: FromDishka[ChatService],
 ):
-
     await manage_chat(
         message=message,
         res=res,
@@ -98,15 +94,19 @@ async def continue_chat(
     res: FromDishka[UserResoucres],
     chat_service: FromDishka[ChatService],
 ):
-    await manage_chat(
-        message=message,
-        res=res,
-        chat_service=chat_service,
-        action=TopicAction.TOPIC_CONTINUE,
-    )
+    try:
+        await manage_chat(
+            message=message,
+            res=res,
+            chat_service=chat_service,
+            action=TopicAction.TOPIC_CONTINUE,
+        )
+    except Exception as e:
+        logging.warning(f"Got exception: {e}")
+        await message.reply(f"К сожалению данный чат истёк. Пожалуйста, начните новый.")
 
 
-@router.message(Command(commands=["ai_list"]))
+@router.message(Command(commands=["credits"]))
 async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]):
     result = "Потрачено кредитов:"
     for user in sorted(
