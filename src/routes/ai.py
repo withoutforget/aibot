@@ -32,7 +32,7 @@ async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]
         output = f"<a href='{metadata['topic_start']}'>Начало диалога</a>. Диалог был начат {metadata['topic_starter']}."
 
         await message.reply(text=output, parse_mode=ParseMode.HTML)
-    except:
+    except Exception as _:
         await message.reply("К сожалению, информации о данном чате нет.")
 
 
@@ -74,6 +74,7 @@ async def manage_chat(
 
     chat_service.include_messasge(uuid, new_message.message_id)
 
+
 @router.message(Command(commands=["ai"]))
 async def create_chat(
     message: Message,
@@ -103,7 +104,7 @@ async def continue_chat(
         )
     except Exception as e:
         logging.warning(f"Got exception: {e}")
-        await message.reply(f"К сожалению данный чат истёк. Пожалуйста, начните новый.")
+        await message.reply("К сожалению данный чат истёк. Пожалуйста, начните новый.")
 
 
 @router.message(Command(commands=["credits"]))

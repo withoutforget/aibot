@@ -15,4 +15,6 @@ async def ai_help(message: Message):
         "/help": "Показывает man.",
     }
 
-    await message.reply("Используйте /ai, чтобы начать диалог.")
+    await message.reply(
+        "\n".join(f"{k} — {v}".format(k=k, v=v) for k, v in commands.items())
+    )
