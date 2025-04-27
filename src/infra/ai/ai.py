@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from src.config import GeminiConfig
 from google.genai.chats import Chat
 from src.infra.ai.chat_generator import ChatGenerator
 from uuid import uuid4, UUID
@@ -17,10 +18,12 @@ class ChatObject:
 
 class Chats:
     generator: ChatGenerator
+    gemini: GeminiConfig
     _chats: list[ChatObject] = []
 
-    def __init__(self, generator: ChatGenerator):
+    def __init__(self, generator: ChatGenerator, gemini: GeminiConfig):
         self.generator = generator
+        self.gemini = gemini
 
     def find_chat(self, message_id: int) -> ChatObject | None:
         for co in self._chats:
@@ -50,5 +53,5 @@ class Chats:
 
     def expire_chats(self):
         for co in self._chats:
-            if co.last_time_used + 300 < time():
+            if co.last_time_used + self.gemini.chat_timeout < time():
                 self._chats.remove(co)

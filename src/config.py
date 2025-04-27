@@ -31,6 +31,7 @@ class GeminiConfig:
     api_key: str
     model: str
     format_string: str
+    chat_timeout: int
 
     basic: GeminiModelConfig
     full: GeminiModelConfig

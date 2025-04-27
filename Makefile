@@ -18,6 +18,8 @@ clean:
 	uv run pyclean .
 	uv clean
 	$(RM) logs
+log_clean:
+	$(RM) logs
 depends:
 	uv venv
 	uv sync

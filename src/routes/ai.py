@@ -13,10 +13,12 @@ from src.usecases.ai import ChatService
 
 from enum import Enum
 
+
 class TopicAction(Enum):
     TOPIC_START = 1
     TOPIC_CONTINUE = 2
     TOPIC_START_WITH_CONTEXT = 3
+
 
 router = Router()
 
@@ -24,15 +26,17 @@ router = Router()
 @router.message(Command(commands=["info"]), RepliedToBotFilter())
 async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]):
     metadata = chat_service.get_metadata(message.reply_to_message.message_id)
-    await message.reply( '\n'.join(f'{k} - {v}' for k,v in metadata.items()) )
+    
+    output = f"<a href='{metadata['topic_start']}'>Начало диалога</a>. Диалог был начат {metadata['topic_starter']}."
+
+    await message.reply( text = output, parse_mode=ParseMode.HTML )
 
 
 async def manage_chat(
-        message: Message,
-        res: UserResoucres,
-        chat_service: ChatService,
-        action: ChatAction,
-        context: list[Message] | None = None
+    message: Message,
+    res: UserResoucres,
+    chat_service: ChatService,
+    action: ChatAction,
 ):
     text = message.text.lstrip("/ai")
     user = message.from_user
@@ -50,10 +54,11 @@ async def manage_chat(
 
         match action:
             case TopicAction.TOPIC_START:
-                result, uuid = chat_service.start_chat(msg=message,
-                                                       context=context)
+                result, uuid = chat_service.start_chat(msg=message)
             case TopicAction.TOPIC_CONTINUE:
-                result, uuid = chat_service.continue_chat(message.reply_to_message, message)
+                result, uuid = chat_service.continue_chat(
+                    message.reply_to_message, message
+                )
 
         tokens_used = result.usage_metadata.total_token_count
 
@@ -70,7 +75,7 @@ async def manage_chat(
 
     except Exception as e:
         await message.reply(f"Что-то пошло не так... ({e})")
-    
+
 
 @router.message(Command(commands=["ai"]))
 async def create_chat(
@@ -79,20 +84,11 @@ async def create_chat(
     chat_service: FromDishka[ChatService],
 ):
 
-    if message.reply_to_message is not None:
-        context = [ message.reply_to_message ]
-    else:
-        context = [ ]       
-
-    if len(context) == 0:
-        context = None
-
     await manage_chat(
         message=message,
-        res = res,
+        res=res,
         chat_service=chat_service,
         action=TopicAction.TOPIC_START,
-        context = context
     )
 
 
@@ -104,9 +100,9 @@ async def continue_chat(
 ):
     await manage_chat(
         message=message,
-        res = res,
+        res=res,
         chat_service=chat_service,
-        action=TopicAction.TOPIC_CONTINUE
+        action=TopicAction.TOPIC_CONTINUE,
     )
 
 
