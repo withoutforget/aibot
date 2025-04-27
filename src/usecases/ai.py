@@ -43,7 +43,7 @@ class ChatService:
         result = self._send_to_chat_with(msg, new_chat.chat, context)
         return result, new_chat.uuid
 
-    def include_messasge(self, uuid: UUID, message_id: int):
+    def include_message(self, uuid: UUID, message_id: int):
         self._chats.get_chat(uuid).messages.add(message_id)
 
     def continue_chat(

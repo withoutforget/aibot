@@ -72,7 +72,7 @@ async def manage_chat(
         telegram_format(result.text), parse_mode=ParseMode.HTML
     )
 
-    chat_service.include_messasge(uuid, new_message.message_id)
+    chat_service.include_message(uuid, new_message.message_id)
 
 
 @router.message(Command(commands=["ai"]))
