@@ -30,3 +30,6 @@ check:
 	uv run ruff check
 
 all: depends check clean init_dirs run
+
+docker_del:
+	docker rm (docker ps -a -q)
