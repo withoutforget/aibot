@@ -109,9 +109,13 @@ async def create_chat(
     if message.reply_to_message is not None:
         if message.reply_to_message.text is not None:
             action = TopicAction.TOPIC_START_WITH_CONTEXT
-    await manage_chat(
-        message=message, res=res, chat_service=chat_service, action=action
-    )
+
+    try:
+        await manage_chat(
+            message=message, res=res, chat_service=chat_service, action=action
+        )
+    except Exception as e:
+        await message.reply(f'{e}')
 
 
 @router.message(RepliedToBotFilter())
