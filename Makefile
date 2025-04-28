@@ -37,3 +37,6 @@ docker_compose:
 	docker compose up
 docker_dis:
 	docker-compose down --volumes
+docker_start:
+	docker compose build
+	docker compose up
