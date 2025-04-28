@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infra.sqlalchemy.models import User
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker
-import asyncio
 
 TelegramID = int
+
 
 class UserResoucres:
     _session: async_sessionmaker[AsyncSession]
@@ -13,7 +12,7 @@ class UserResoucres:
     def __init__(self, session: async_sessionmaker[AsyncSession]):
         self._session = session
 
-    async def _get_user(self, id : TelegramID) -> User | None:
+    async def _get_user(self, id: TelegramID) -> User | None:
         async with self._session.begin() as session:
             stmt = select(User).where(User.telegram_id == id)
             res = await session.execute(stmt)
@@ -29,15 +28,14 @@ class UserResoucres:
         async with self._session.begin() as session:
             session.add(
                 User(
-                    telegram_id = id,
-                    username = username,
-                    tokens_used = 0,
-                    message_count = 0,
+                    telegram_id=id,
+                    username=username,
+                    tokens_used=0,
+                    message_count=0,
                 )
             )
             await session.flush()
             return True
-        
 
     async def increment_tokens(self, id: TelegramID, tokens: int) -> bool:
         u = await self._get_user(id)
@@ -53,7 +51,7 @@ class UserResoucres:
             await session.execute(stmt)
             await session.flush()
         return True
-    
+
     async def get_users(self) -> list[User]:
         stmt = select(User)
         async with self._session.begin() as session:
@@ -63,4 +61,3 @@ class UserResoucres:
                 ret.append(i)
             await session.flush()
             return ret
-        

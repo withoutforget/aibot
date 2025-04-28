@@ -14,8 +14,6 @@ from src.usecases.ai import ChatService
 
 from enum import Enum
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 
 class TopicAction(Enum):
     TOPIC_START = 1
@@ -38,7 +36,7 @@ async def delete_dialog(message: Message, chat_service: FromDishka[ChatService])
     if len(message_ids) == 0:
         await message.reply("Не могу удалить этот чат.")
         return
-    if count == None:
+    if count is None:
         count = len(message_ids)
     message_ids = sorted(message_ids, reverse=True)[: count * 2]
     message_ids.append(message.message_id)
@@ -112,10 +110,7 @@ async def create_chat(
         if message.reply_to_message.text is not None:
             action = TopicAction.TOPIC_START_WITH_CONTEXT
     await manage_chat(
-        message=message,
-        res=res,
-        chat_service=chat_service,
-        action=action
+        message=message, res=res, chat_service=chat_service, action=action
     )
 
 
@@ -143,9 +138,6 @@ async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]
 
     users = await user_res.get_users()
 
-
-    for user in sorted(
-        users, key=lambda u: u.tokens_used, reverse=True
-    ):
+    for user in sorted(users, key=lambda u: u.tokens_used, reverse=True):
         result += f"\nt.me/{user.username} - {user.tokens_used} ({user.message_count} messages);"
     await message.reply(result)

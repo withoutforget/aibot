@@ -11,9 +11,8 @@ from src.infra.ai.ai import Chats, ChatGenerator
 from src.infra.user_resources.users import UserResoucres
 from src.usecases.ai import ChatService
 from sqlalchemy.engine import create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncConnection
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncConnection
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from typing import AsyncGenerator
 from src.infra.sqlalchemy.models import Base
 
 
@@ -49,7 +48,9 @@ class MyProvider(Provider):
         return self.tmp["chats"]
 
     @provide
-    async def _get_user_res(self, session: async_sessionmaker[AsyncSession]) -> UserResoucres:
+    async def _get_user_res(
+        self, session: async_sessionmaker[AsyncSession]
+    ) -> UserResoucres:
         if "user_res" not in self.tmp.keys():
             self.tmp["user_res"] = UserResoucres(session=session)
         return self.tmp["user_res"]
@@ -73,7 +74,8 @@ class MyProvider(Provider):
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
 
-        return  self.tmp["async_engine"]
+        return self.tmp["async_engine"]
+
     @provide
     async def _get_connection(self, engine: AsyncEngine) -> AsyncConnection:
         if "async_conn" not in self.tmp.keys():
