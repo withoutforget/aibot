@@ -1,6 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, BigInteger
 
 
 class Base(DeclarativeBase):
@@ -11,9 +11,9 @@ class User(Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    telegram_id: Mapped[int] = mapped_column(Integer(), unique=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger(), unique=True)
     username: Mapped[str] = mapped_column(String(128))
-    tokens_used: Mapped[int] = mapped_column(Integer())
+    tokens_used: Mapped[int] = mapped_column(BigInteger())
     message_count: Mapped[int] = mapped_column(Integer())
 
     def __repr__(self) -> str:
