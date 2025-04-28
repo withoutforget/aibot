@@ -14,6 +14,9 @@ from src.usecases.ai import ChatService
 
 from enum import Enum
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
 class TopicAction(Enum):
     TOPIC_START = 1
     TOPIC_CONTINUE = 2
@@ -22,9 +25,10 @@ class TopicAction(Enum):
 
 router = Router()
 
-@router.message(Command(commands=['del']))
+
+@router.message(Command(commands=["del"]))
 async def delete_dialog(message: Message, chat_service: FromDishka[ChatService]):
-    count = message.text.lstrip('/del ')
+    count = message.text.lstrip("/del ")
     if count.isdecimal():
         count = int(count)
     else:
@@ -32,16 +36,14 @@ async def delete_dialog(message: Message, chat_service: FromDishka[ChatService])
 
     message_ids = chat_service.get_history(message)
     if len(message_ids) == 0:
-        await message.reply('Не могу удалить этот чат.')
+        await message.reply("Не могу удалить этот чат.")
         return
     if count == None:
         count = len(message_ids)
-    message_ids = sorted(message_ids, reverse = True)[:count * 2]
-    message_ids.append(message.message_id) 
-    await message.bot.delete_messages(
-        chat_id = message.chat.id,
-        message_ids=message_ids
-    )
+    message_ids = sorted(message_ids, reverse=True)[: count * 2]
+    message_ids.append(message.message_id)
+    await message.bot.delete_messages(chat_id=message.chat.id, message_ids=message_ids)
+
 
 @router.message(Command(commands=["stats"]), RepliedToBotFilter())
 async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]):
@@ -80,14 +82,16 @@ async def manage_chat(
         case TopicAction.TOPIC_CONTINUE:
             result, uuid = chat_service.continue_chat(message.reply_to_message, message)
         case TopicAction.TOPIC_START_WITH_CONTEXT:
-            result, uuid = chat_service.start_chat(msg = message, context = message.reply_to_message.text)
+            result, uuid = chat_service.start_chat(
+                msg=message, context=message.reply_to_message.text
+            )
 
     tokens_used = result.usage_metadata.total_token_count
 
-    if not res.user_exist(user.id):
-        res.add_user(user.id, user.username)
+    if not await res.user_exist(user.id):
+        await res.add_user(user.id, user.username)
 
-    res.increment_tokens(user.id, tokens_used)
+    await res.increment_tokens(user.id, tokens_used)
 
     new_message = await message.reply(
         telegram_format(result.text), parse_mode=ParseMode.HTML
@@ -111,7 +115,7 @@ async def create_chat(
         message=message,
         res=res,
         chat_service=chat_service,
-        action=action,
+        action=action
     )
 
 
@@ -140,4 +144,5 @@ async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]
         user_res._data.values(), key=lambda u: u.tokens_used, reverse=True
     ):
         result += f"\nt.me/{user.username} - {user.tokens_used} ({user.promts_generated} messages);"
+    result += '\n'.join(await user_res._get_all())
     await message.reply(result)

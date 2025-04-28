@@ -35,3 +35,5 @@ docker_del:
 	docker rm (docker ps -a -q)
 docker_compose:
 	docker compose up
+docker_dis:
+	docker-compose down --volumes

@@ -7,10 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "adaptix>=3.0.0b10",
     "aiogram>=3.20.0.post0",
+    "asyncpg>=0.30.0",
     "chatgpt-md-converter>=0.3.4",
     "dishka>=1.5.3",
     "dynaconf>=3.2.10",
     "google-genai>=1.12.1",
     "pyclean>=3.1.0",
     "ruff>=0.11.7",
+    "sqlalchemy>=2.0.40",
 ]

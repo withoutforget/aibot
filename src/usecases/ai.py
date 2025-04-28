@@ -15,7 +15,9 @@ class ChatService:
 
     def _format_request(self, msg: Message, context: str = "") -> str:
         return self._gemini.format_string.format(
-            username=msg.from_user.username, text=msg.text.lstrip('/ai'), context=context
+            username=msg.from_user.username,
+            text=msg.text.lstrip("/ai"),
+            context=context,
         )
 
     def _send_to_chat_with(self, msg: Message, chat: Chat, context: str = ""):

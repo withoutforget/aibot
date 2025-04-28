@@ -1,5 +1,5 @@
 [bot]
-is_debug = false
+is_debug = true
 [ai]
 
     [ai.gemini]
@@ -16,3 +16,7 @@ is_debug = false
         promt_file = './config/ai_promt.txt'
         tokens = 600
         temperature = 0.2
+[postgres]
+dbname = 'pgdb'
+username = 'admin'
+password='123456'

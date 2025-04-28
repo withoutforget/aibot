@@ -4,6 +4,8 @@ from adaptix import Retort
 
 from google.genai.types import GenerateContentConfig
 
+from sqlalchemy import URL
+
 
 @dataclass()
 class BotConfig:
@@ -43,9 +45,27 @@ class AIConfig:
 
 
 @dataclass()
+class PostgresConfig:
+    dbname: str
+    username: str
+    password: str
+
+    def dsn(self) -> str:
+        return URL.create(
+            drivername="postgresql+asyncpg",
+            username=self.username,
+            password=self.password,
+            database=self.dbname,
+            host="postgres",
+            port=5432,
+        )
+
+
+@dataclass()
 class Config:
     bot: BotConfig
     ai: AIConfig
+    postgres: PostgresConfig
 
 
 def get_config() -> Config:
