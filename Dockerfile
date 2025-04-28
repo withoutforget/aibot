@@ -2,7 +2,6 @@ FROM python:3.13.2-slim
 
 WORKDIR /
 
-ADD src /src
 ADD config /config/
 
 RUN mkdir -p /logs/

@@ -14,7 +14,6 @@ from src.usecases.ai import ChatService
 
 from enum import Enum
 
-
 class TopicAction(Enum):
     TOPIC_START = 1
     TOPIC_CONTINUE = 2
@@ -23,6 +22,26 @@ class TopicAction(Enum):
 
 router = Router()
 
+@router.message(Command(commands=['del']))
+async def delete_dialog(message: Message, chat_service: FromDishka[ChatService]):
+    count = message.text.lstrip('/del ')
+    if count.isdecimal():
+        count = int(count)
+    else:
+        count = None
+
+    message_ids = chat_service.get_history(message)
+    if len(message_ids) == 0:
+        await message.reply('Не могу удалить этот чат.')
+        return
+    if count == None:
+        count = len(message_ids)
+    message_ids = sorted(message_ids, reverse = True)[:count * 2]
+    message_ids.append(message.message_id) 
+    await message.bot.delete_messages(
+        chat_id = message.chat.id,
+        message_ids=message_ids
+    )
 
 @router.message(Command(commands=["stats"]), RepliedToBotFilter())
 async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]):
@@ -60,6 +79,8 @@ async def manage_chat(
             result, uuid = chat_service.start_chat(msg=message)
         case TopicAction.TOPIC_CONTINUE:
             result, uuid = chat_service.continue_chat(message.reply_to_message, message)
+        case TopicAction.TOPIC_START_WITH_CONTEXT:
+            result, uuid = chat_service.start_chat(msg = message, context = message.reply_to_message.text)
 
     tokens_used = result.usage_metadata.total_token_count
 
@@ -73,6 +94,7 @@ async def manage_chat(
     )
 
     chat_service.include_message(uuid, new_message.message_id)
+    chat_service.include_message(uuid, message.message_id)
 
 
 @router.message(Command(commands=["ai"]))
@@ -81,11 +103,15 @@ async def create_chat(
     res: FromDishka[UserResoucres],
     chat_service: FromDishka[ChatService],
 ):
+    action = TopicAction.TOPIC_START
+    if message.reply_to_message is not None:
+        if message.reply_to_message.text is not None:
+            action = TopicAction.TOPIC_START_WITH_CONTEXT
     await manage_chat(
         message=message,
         res=res,
         chat_service=chat_service,
-        action=TopicAction.TOPIC_START,
+        action=action,
     )
 
 

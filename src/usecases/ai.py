@@ -15,7 +15,7 @@ class ChatService:
 
     def _format_request(self, msg: Message, context: str = "") -> str:
         return self._gemini.format_string.format(
-            username=msg.from_user.username, text=msg.text, context=context
+            username=msg.from_user.username, text=msg.text.lstrip('/ai'), context=context
         )
 
     def _send_to_chat_with(self, msg: Message, chat: Chat, context: str = ""):
@@ -41,6 +41,7 @@ class ChatService:
         new_chat.link_to_topic_start = f"t.me/c/{msg_link}"
 
         result = self._send_to_chat_with(msg, new_chat.chat, context)
+
         return result, new_chat.uuid
 
     def include_message(self, uuid: UUID, message_id: int):
@@ -63,3 +64,16 @@ class ChatService:
                 "topic_starter": chat.topic_starter_username,
             }
         return {}
+
+    def get_history(self, message: Message) -> list[int]:
+        msg = None
+        if message.reply_to_message is not None:
+            if message.reply_to_message.from_user.id == message.bot.id:
+                msg = message.reply_to_message
+        if msg is None:
+            return []
+        msg: Message = msg
+        co = self._chats.find_chat(msg.message_id)
+        if co is None:
+            return []
+        return list(co.messages)
