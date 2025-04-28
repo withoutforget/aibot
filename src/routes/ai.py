@@ -140,9 +140,12 @@ async def continue_chat(
 @router.message(Command(commands=["credits"]))
 async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]):
     result = "Потрачено кредитов:"
+
+    users = await user_res.get_users()
+
+
     for user in sorted(
-        user_res._data.values(), key=lambda u: u.tokens_used, reverse=True
+        users, key=lambda u: u.tokens_used, reverse=True
     ):
-        result += f"\nt.me/{user.username} - {user.tokens_used} ({user.promts_generated} messages);"
-    result += '\n'.join(await user_res._get_all())
+        result += f"\nt.me/{user.username} - {user.tokens_used} ({user.message_count} messages);"
     await message.reply(result)

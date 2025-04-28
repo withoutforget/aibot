@@ -49,7 +49,7 @@ class MyProvider(Provider):
         return self.tmp["chats"]
 
     @provide
-    async def _get_user_res(self, session: AsyncSession) -> UserResoucres:
+    async def _get_user_res(self, session: async_sessionmaker[AsyncSession]) -> UserResoucres:
         if "user_res" not in self.tmp.keys():
             self.tmp["user_res"] = UserResoucres(session=session)
         return self.tmp["user_res"]
@@ -83,10 +83,8 @@ class MyProvider(Provider):
     @provide
     async def _get_session(
         self, engine: AsyncEngine
-    ) -> AsyncGenerator[AsyncSession, None]:
-        Session = async_sessionmaker(engine, expire_on_commit=False)
-        async with Session.begin() as session:
-            yield session
+    ) -> async_sessionmaker[AsyncSession]:
+        return async_sessionmaker(engine, expire_on_commit=False)
 
 
 def get_container() -> AsyncContainer:

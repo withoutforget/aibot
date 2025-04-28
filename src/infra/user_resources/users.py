@@ -1,60 +1,66 @@
 from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infra.sqlalchemy.models import User
-from sqlalchemy import select
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import async_sessionmaker
 import asyncio
 
 TelegramID = int
 
-
-@dataclass()
-class UserData:
-    username: str
-    tokens_used: int = 0
-    promts_generated: int = 0
-
-
 class UserResoucres:
-    _data: dict[TelegramID, UserData] = dict()
-    _session: AsyncSession
+    _session: async_sessionmaker[AsyncSession]
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: async_sessionmaker[AsyncSession]):
         self._session = session
 
+    async def _get_user(self, id : TelegramID) -> User | None:
+        async with self._session.begin() as session:
+            stmt = select(User).where(User.telegram_id == id)
+            res = await session.execute(stmt)
+            await session.flush()
+            return res.scalar()
+
     async def user_exist(self, id: TelegramID) -> bool:
-        return id in self._data.keys()
-    
-    async def _user_exist(self, id: TelegramID) -> bool:
-        stmt = select(User).where(User.telegram_id == id)
-        return await self._session.scalar(stmt)
+        return await self._get_user(id) is not None
 
     async def add_user(self, id: TelegramID, username: str) -> bool:
-        if not await self._user_exist(id):
-            new_user = User(
-                telegram_id = id,
-                username = username,
-                tokens_used = 0
-            )
-
-            self._session.add(new_user)
-
-            await self._session.commit()
-    
         if await self.user_exist(id):
             return False
-        self._data[id] = UserData(username)
-        return True
+        async with self._session.begin() as session:
+            session.add(
+                User(
+                    telegram_id = id,
+                    username = username,
+                    tokens_used = 0,
+                    message_count = 0,
+                )
+            )
+            await session.flush()
+            return True
+        
 
     async def increment_tokens(self, id: TelegramID, tokens: int) -> bool:
-        if not await self.user_exist(id):
+        u = await self._get_user(id)
+        if u is None:
             return False
-        self._data[id].tokens_used += tokens
-        self._data[id].promts_generated += 1
+        async with self._session.begin() as session:
+            stmt = (
+                update(User)
+                .where(User.telegram_id == id)
+                .values(tokens_used=User.tokens_used + tokens)
+                .values(message_count=User.message_count + 1)
+            )
+            await session.execute(stmt)
+            await session.flush()
         return True
     
-    async def _get_all(self) -> list[str]:
-        res = list()
-        expr = select(User)
-        for u in await self._session.scalars(expr):
-            res.append(str(u))
-        return res
+    async def get_users(self) -> list[User]:
+        stmt = select(User)
+        async with self._session.begin() as session:
+            res = await session.execute(stmt)
+            ret = []
+            for i in res.scalars():
+                ret.append(i)
+            await session.flush()
+            return ret
+        
