@@ -2,7 +2,7 @@ from logging.config import fileConfig
 
 from src.config import get_config
 
-from src.infra.sqlalchemy.models import User, Base # noqa
+from src.infra.sqlalchemy.models import Base,User # noqa
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -20,8 +20,6 @@ config.set_main_option(
 )
 
 target_metadata = Base.metadata
-
-
 
 
 def run_migrations_offline() -> None:

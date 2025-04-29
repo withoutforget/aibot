@@ -1,14 +1,11 @@
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, BigInteger
-
-
-class Base(DeclarativeBase):
-    pass
+from src.infra.sqlalchemy.basemodel import Base
 
 
 class User(Base):
     __tablename__ = "user"
+    __table_args__ = {"schema": "foo"}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger(), unique=True)
