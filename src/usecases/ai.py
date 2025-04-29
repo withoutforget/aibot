@@ -16,7 +16,7 @@ class ChatService:
     def _format_request(self, msg: Message, context: str = "") -> str:
         return self._gemini.format_string.format(
             username=msg.from_user.username,
-            text=msg.text.lstrip("/ai"),
+            text=msg.text,
             context=context,
         )
 
@@ -35,7 +35,7 @@ class ChatService:
         new_chat = self._chats.create_chat()
         new_chat.topic_starter_username = f"@{msg.from_user.username}"
 
-        msg_link = f"{str(msg.chat.id).lstrip('-100')}/"
+        msg_link = f"{str(msg.chat.id).removeprefix('-100')}/"
         if msg.message_thread_id is not None:
             msg_link += f"{msg.message_thread_id}/"
         msg_link += f"{msg.message_id}"

@@ -28,7 +28,7 @@ router = Router()
 async def delete_dialog(message: Message, chat_service: FromDishka[ChatService]):
     try:
 
-        count = message.text.lstrip("/del ")
+        count = message.text.removeprefix('/del ')
         if count.isdecimal():
             count = int(count)
         else:
@@ -66,7 +66,7 @@ async def manage_chat(
     chat_service: ChatService,
     action: ChatAction,
 ):
-    text = message.text.lstrip("/ai")
+    text = message.text.removeprefix('/ai ')
     user = message.from_user
 
     if len(text) == 0:
