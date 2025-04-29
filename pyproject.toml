@@ -7,7 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "adaptix>=3.0.0b10",
     "aiogram>=3.20.0.post0",
-    "alembic>=1.15.2",
     "asyncpg>=0.30.0",
     "chatgpt-md-converter>=0.3.4",
     "dishka>=1.5.3",
