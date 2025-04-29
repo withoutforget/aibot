@@ -40,5 +40,8 @@ docker_compose:
 docker_dis:
 	docker-compose down --volumes
 docker_start:
-	docker compose build
-	docker compose up
+	docker compose build postgres bot
+	docker compose up postgres bot
+
+makemigrations:
+	docker compose run --rm migrations uv run alembic revision --autogenerate

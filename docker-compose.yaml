@@ -2,6 +2,7 @@ services:
   bot:
     build:
       context: .
+      target: bot-image
       dockerfile: Dockerfile
     container_name: aibot
     volumes:
@@ -11,6 +12,8 @@ services:
       - backend
 
   postgres:
+    profiles:
+      - infra
     image: postgres
     restart: always
     environment:
@@ -28,6 +31,21 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - backend
+
+  alembic:
+    profiles:
+      - tools
+    build:
+      context: .
+      target: alembic-image
+      dockerfile: Dockerfile
+    volumes:
+      - ./src/:/src/
+      - ./config/:/config/
+      - ./alembic:/alembic/
+    networks:
+      - backend
+
 volumes:
   pgdata:
 networks:
