@@ -115,7 +115,7 @@ async def create_chat(
             message=message, res=res, chat_service=chat_service, action=action
         )
     except Exception as e:
-        await message.reply(f'{e}')
+        await message.reply(f"{e}")
 
 
 @router.message(RepliedToBotFilter())

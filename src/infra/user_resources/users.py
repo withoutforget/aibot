@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infra.sqlalchemy.models import User
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import async_sessionmaker
 
 TelegramID = int
 

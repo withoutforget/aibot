@@ -59,6 +59,7 @@ class PostgresConfig:
             host="postgres",
             port=5432,
         ).render_as_string(False)
+
     @property
     def pdsn(self) -> str:
         return self.dsn()
