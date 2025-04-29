@@ -120,7 +120,7 @@ async def create_chat(
             message=message, res=res, chat_service=chat_service, action=action
         )
     except Exception as e:
-        await message.reply(f"{e}")
+        await message.reply(f"Что-то пошло не так... {e}")
 
 
 @router.message(RepliedToBotFilter())
@@ -138,7 +138,7 @@ async def continue_chat(
         )
     except Exception as e:
         logging.warning(f"Got exception: {e}")
-        await message.reply("Что-то пошло не так. {e}")
+        await message.reply(f"Что-то пошло не так. {e}")
 
 
 @router.message(Command(commands=["credits"]))
