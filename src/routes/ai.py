@@ -56,7 +56,7 @@ async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]
         output = f"<a href='{metadata['topic_start']}'>Начало диалога</a>. Диалог был начат {metadata['topic_starter']}."
 
         await message.reply(text=output, parse_mode=ParseMode.HTML)
-    except Exception as _:
+    except Exception as e:
         await message.reply(f"К сожалению, информации о данном чате нет. {e}")
 
 
