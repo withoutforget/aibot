@@ -6,6 +6,7 @@ from src.infra.sqlalchemy.models import Base,User # noqa
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.schema import CreateSchema
 
 from alembic import context
 
@@ -54,6 +55,9 @@ def run_migrations_online() -> None:
             connection=connection, target_metadata=target_metadata,
             compare_type=True
         )
+
+        connection.execute(CreateSchema(name = 'foo', if_not_exists=True))
+
 
         with context.begin_transaction():
             context.run_migrations()

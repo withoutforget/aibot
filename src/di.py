@@ -43,7 +43,6 @@ class MyProvider(Provider):
                 sync_engine=create_engine(url=config.postgres.dsn())
             )
         async with engine.begin() as conn:
-            await conn.execute(CreateSchema(name = 'foo', if_not_exists=True))
             await conn.run_sync(Base.metadata.create_all)
 
         return engine
