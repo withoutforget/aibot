@@ -26,21 +26,26 @@ router = Router()
 
 @router.message(Command(commands=["del"]))
 async def delete_dialog(message: Message, chat_service: FromDishka[ChatService]):
-    count = message.text.lstrip("/del ")
-    if count.isdecimal():
-        count = int(count)
-    else:
-        count = None
+    try:
 
-    message_ids = chat_service.get_history(message)
-    if len(message_ids) == 0:
-        await message.reply("Не могу удалить этот чат.")
-        return
-    if count is None:
-        count = len(message_ids)
-    message_ids = sorted(message_ids, reverse=True)[: count * 2]
-    message_ids.append(message.message_id)
-    await message.bot.delete_messages(chat_id=message.chat.id, message_ids=message_ids)
+        count = message.text.lstrip("/del ")
+        if count.isdecimal():
+            count = int(count)
+        else:
+            count = None
+
+        message_ids = chat_service.get_history(message)
+        if len(message_ids) == 0:
+            await message.reply("Не могу удалить этот чат.")
+            return
+        if count is None:
+            count = len(message_ids)
+        message_ids = sorted(message_ids, reverse=True)[: count * 2]
+        message_ids.append(message.message_id)
+        await message.bot.delete_messages(chat_id=message.chat.id, message_ids=message_ids)
+    
+    except Exception as e:
+        await message.reply(f'Что-то пошло не так: {e}')    
 
 
 @router.message(Command(commands=["stats"]), RepliedToBotFilter())
@@ -52,7 +57,7 @@ async def get_topic_info(message: Message, chat_service: FromDishka[ChatService]
 
         await message.reply(text=output, parse_mode=ParseMode.HTML)
     except Exception as _:
-        await message.reply("К сожалению, информации о данном чате нет.")
+        await message.reply(f"К сожалению, информации о данном чате нет. {e}")
 
 
 async def manage_chat(
@@ -133,15 +138,19 @@ async def continue_chat(
         )
     except Exception as e:
         logging.warning(f"Got exception: {e}")
-        await message.reply("К сожалению данный чат истёк. Пожалуйста, начните новый.")
+        await message.reply("Что-то пошло не так. {e}")
 
 
 @router.message(Command(commands=["credits"]))
 async def get_list_balance(message: Message, user_res: FromDishka[UserResoucres]):
-    result = "Потрачено кредитов:"
+    try:
+        result = "Потрачено кредитов:"
 
-    users = await user_res.get_users()
+        users = await user_res.get_users()
 
-    for user in sorted(users, key=lambda u: u.tokens_used, reverse=True):
-        result += f"\nt.me/{user.username} - {user.tokens_used} ({user.message_count} messages);"
-    await message.reply(result)
+        for user in sorted(users, key=lambda u: u.tokens_used, reverse=True):
+            result += f"\nt.me/{user.username} - {user.tokens_used} ({user.message_count} messages);"
+        await message.reply(result)
+    except Exception as e:
+        await message.reply(f'Что-то пошло не так: {e}')    
+
