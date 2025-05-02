@@ -6,6 +6,7 @@ from src.config import GeminiConfig
 class ChatGenerator:
     config: GeminiConfig
     client: Client
+    
 
     def __init__(self, config: GeminiConfig):
         self.config = config
