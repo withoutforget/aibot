@@ -73,6 +73,9 @@ class Config:
 
 
 def get_config() -> Config:
-    dyna = Dynaconf(settings_files=["./config/config.toml", "./config/.secrets.toml"])
+    dyna = Dynaconf(
+        settings_files=["./config/config.toml", "./config/.secrets.toml"],
+        enviroment = True
+        )
     cfg = Retort().load(dyna, Config)
     return cfg
