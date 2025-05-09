@@ -1,5 +1,5 @@
 [default.bot]
-is_debug = false
+is_debug = true
 [default.ai]
 
     [default.ai.gemini]

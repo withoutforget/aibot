@@ -87,5 +87,7 @@ def get_config() -> Config:
         
     )
 
+
     cfg = retort.load(dyna, Config)
+
     return cfg
