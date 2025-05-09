@@ -1,7 +1,7 @@
 init:
 	mkdir logs
 run:
-	docker compose up -d
+	docker compose up --verbose
 watch:
 	docker compose up --watch
 stop:

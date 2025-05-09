@@ -1,18 +1,5 @@
 services:
-  bot:
-    build:
-      context: .
-      target: bot-image
-      dockerfile: Dockerfile
-    container_name: aibot
-    volumes:
-      - ./src/:/src/
-      - ./config/:/config/
-    env_file:
-      - .env
   postgres:
-    profiles:
-      - infra
     image: postgres
     restart: always
     environment:
@@ -29,9 +16,21 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  bot:
+    depends_on:
+      - postgres
+    build:
+      context: .
+      target: bot-image
+      dockerfile: Dockerfile
+    container_name: aibot
+    volumes:
+      - ./src/:/src/
+      - ./config/:/config/
+    env_file:
+      - .env
+
   alembic:
-    profiles:
-      - tools
     depends_on:
       - postgres
     build:
@@ -46,7 +45,4 @@ services:
 
 volumes:
   pgdata:
-    driver: local
-networks:
-  backend:
     driver: local
