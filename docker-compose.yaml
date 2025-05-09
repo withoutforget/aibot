@@ -8,8 +8,6 @@ services:
     volumes:
       - ./src/:/src/
       - ./config/:/config/
-    networks:
-      - backend
 
   postgres:
     profiles:
@@ -29,12 +27,12 @@ services:
       retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - backend
 
   alembic:
     profiles:
       - tools
+    depends_on:
+      - postgres
     build:
       context: .
       target: alembic-image
@@ -43,11 +41,11 @@ services:
       - ./src/:/src/
       - ./config/:/config/
       - ./alembic:/alembic/
-    networks:
-      - backend
+    command: uv run alembic upgrade head
 
 volumes:
   pgdata:
+    driver: local
 networks:
   backend:
-    driver: bridge
+    driver: local
