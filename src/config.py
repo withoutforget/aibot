@@ -1,20 +1,21 @@
 from dataclasses import dataclass
 from dynaconf import Dynaconf
-from adaptix import Retort
+from adaptix import Retort, name_mapping
 
 from google.genai.types import GenerateContentConfig
 
 from sqlalchemy import URL
 
+import logging
 
-@dataclass()
+@dataclass(slots=True)
 class BotConfig:
     general_api_key: str
     debug_api_key: str
     is_debug: bool
 
 
-@dataclass()
+@dataclass(slots=True)
 class GeminiModelConfig:
     promt_file: str
     tokens: int
@@ -28,7 +29,7 @@ class GeminiModelConfig:
         )
 
 
-@dataclass()
+@dataclass(slots=True)
 class GeminiConfig:
     api_key: str
     model: str
@@ -39,12 +40,12 @@ class GeminiConfig:
     full: GeminiModelConfig
 
 
-@dataclass()
+@dataclass(slots=True)
 class AIConfig:
     gemini: GeminiConfig
 
 
-@dataclass()
+@dataclass(slots=True)
 class PostgresConfig:
     dbname: str
     username: str
@@ -65,7 +66,7 @@ class PostgresConfig:
         return self.dsn()
 
 
-@dataclass()
+@dataclass(slots=True)
 class Config:
     bot: BotConfig
     ai: AIConfig
@@ -74,8 +75,17 @@ class Config:
 
 def get_config() -> Config:
     dyna = Dynaconf(
-        settings_files=["./config/config.toml", "./config/.secrets.toml"],
-        enviroment = True
+        settings_files=["./config/config.toml", '.env'],
+           load_dotenv=True,
+            environments=True,
+            default_env="default",
+            merge_enabled=True,
+            env_switcher="AIBOT_ENV"
         )
-    cfg = Retort().load(dyna, Config)
+    
+    retort = Retort(
+        
+    )
+
+    cfg = retort.load(dyna, Config)
     return cfg

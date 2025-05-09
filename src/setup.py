@@ -6,7 +6,7 @@ from time import time
 import logging
 
 
-def setup_logging(show_all_loggers=False, disable_all_except_aiogram=True):
+def setup_logging(show_all_loggers=False, disable_all_except_aiogram=False):
     log_file_path = f"./logs/{int(time())}.log"
 
     open(log_file_path, "x").close()
