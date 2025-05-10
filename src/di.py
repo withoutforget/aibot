@@ -34,7 +34,7 @@ class MyProvider(Provider):
 
     @provide(scope=Scope.APP)
     async def _get_engine(self, config: Config) -> AsyncEngine:
-        engine = AsyncEngine(sync_engine=create_engine(url=config.postgres.dsn()))
+        engine = AsyncEngine(sync_engine=create_engine(url=config.postgres.dsn))
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 

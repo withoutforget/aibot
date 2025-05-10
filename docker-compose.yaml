@@ -8,11 +8,6 @@ services:
       POSTGRES_DB: pgdb
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d pgdb -p 5432"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
   alembic:

@@ -51,6 +51,7 @@ class PostgresConfig:
     username: str
     password: str
 
+    @property
     def dsn(self) -> str:
         return URL.create(
             drivername="postgresql+asyncpg",
@@ -62,8 +63,15 @@ class PostgresConfig:
         ).render_as_string(False)
 
     @property
-    def pdsn(self) -> str:
-        return self.dsn()
+    def localdsn(self) -> str:
+        return URL.create(
+            drivername="postgresql+asyncpg",
+            username=self.username,
+            password=self.password,
+            database=self.dbname,
+            host="localhost",
+            port=5432,
+        ).render_as_string(False)
 
 
 @dataclass(slots=True)

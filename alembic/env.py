@@ -10,13 +10,26 @@ from sqlalchemy.schema import CreateSchema
 
 from alembic import context
 
+import socket
+
+def is_host_available(hostname, port):
+    try:
+        socket.create_connection((hostname, port), timeout=5) 
+        return True
+    except (socket.error, socket.timeout):
+        return False
+
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+cfg = get_config()
+
+dsn = cfg.postgres.dsn if is_host_available('postgres', 5432) else cfg.postgres.localdsn
+
 config.set_main_option(
-    name="sqlalchemy.url", value=get_config().postgres.dsn() + "?async_fallback=True"
+    name="sqlalchemy.url", value= dsn + "?async_fallback=True"
 )
 
 target_metadata = Base.metadata
